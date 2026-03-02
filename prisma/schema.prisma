@@ -1,0 +1,96 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model users {
+  id          String   @id @default(uuid())
+  name        String  
+  username    String
+  email       String   @unique
+  password    String
+  role_id     String
+  division_id String
+
+  role       roles      @relation(fields: [role_id], references: [id]) 
+  division   divisions  @relation(fields: [division_id], references: [id]) 
+
+ created_at  DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model roles {
+  id      String         @id @default(uuid())
+  name    String      
+  users   users[]
+  roles_menus role_menus[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+}
+model divisions {
+  id    String  @id @default(uuid())
+  name  String   
+  users  users[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model menus {
+  id        String     @id @default(uuid())
+  name      String
+  parent_id String?
+  parent    String?
+  children  String?
+  icon      String?
+  url       String?
+  order     Int?
+  roleMenus role_menus[]
+}
+
+model role_menus {
+  id      String @id @default(uuid())
+  role_id  String
+  menu_id  String
+
+  role    roles   @relation(fields: [role_id], references: [id])
+  menu    menus  @relation(fields: [menu_id], references: [id])
+
+  @@unique([role_id, menu_id])
+}
+
+model storages {
+  id             String     @id @default(uuid())
+  code           String
+  name           String
+  office_code    String?
+  office_label   String?
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model document_types {
+  id             String     @id @default(uuid())
+  code           String
+  name           String
+  description    String?
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+
+model letter_priorities {
+  id             String     @id @default(uuid())
+  name           String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
