@@ -17,6 +17,7 @@ model users {
   password    String
   role_id     String
   division_id String
+  refresh_token  String?  
 
   role       roles      @relation(fields: [role_id], references: [id]) 
   division   divisions  @relation(fields: [division_id], references: [id]) 
