@@ -7,6 +7,7 @@ const letterPriorityRoutes = require("./modules/letter-priority/letterPriority.r
 const documentTypeRoutes = require("./modules/document-type/documentType.route");
 const storageRoutes = require("./modules/storage/storage.route");
 const userRoutes = require("./modules/user/user.route");
+const incomingMails = require("./modules/incoming-mail/incomingMail.route");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -25,5 +26,6 @@ app.use("/api/letter-priorities", letterPriorityRoutes);
 app.use("/api/document-types", documentTypeRoutes);
 app.use("/api/storages", storageRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/incoming-mails", incomingMails);
 
 module.exports = app;

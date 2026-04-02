@@ -22,9 +22,11 @@ model users {
   role       roles      @relation(fields: [role_id], references: [id]) 
   division   divisions  @relation(fields: [division_id], references: [id]) 
 
- created_at  DateTime @default(now())
+  created_at  DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+
 
 model roles {
   id      String         @id @default(uuid())
@@ -94,5 +96,48 @@ model letter_priorities {
   name           String
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
+  incoming_mails incoming_mails[]
 }
+
+
+model incoming_mails {
+  id             String     @id @default(uuid())
+  letter_prioritie_id String
+  name           String
+  receive_date   DateTime
+  address        String
+  mail_number    String
+  regarding      String?
+  file           String?
+  status         Int      @default(0) //0 = new, 1=IN_PROGRESS, 2=COMPLETED, 3=OVERDUE
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  letter_prioritie  letter_priorities   @relation(fields:[letter_prioritie_id], references:[id])
+
+  disposition_mails   incoming_mail_dispositions[]
+}
+
+model dispositions {
+  id            String     @id @default(uuid())
+  name          String
+  created_at    DateTime   @default(now())
+  mails         incoming_mail_dispositions[]
+}
+
+model incoming_mail_dispositions {
+  id                     String     @id @default(uuid())
+  incoiming_mails_id     String
+  dispositions_id         String
+  note                   String?
+  start_date             DateTime?
+  due_date               DateTime?
+  is_complete            Boolean    @default(false)
+  completed_at           DateTime?
+  disposed_at            DateTime?  @default(now())
+  incoming_mail          incoming_mails @relation(fields:[incoiming_mails_id], references:[id], onDelete:Cascade)
+  disposition            dispositions   @relation(fields:[dispositions_id], references:[id])
+ 
+  @@unique([incoiming_mails_id, dispositions_id])
+}
+
 
