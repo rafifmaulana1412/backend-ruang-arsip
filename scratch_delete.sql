@@ -1,0 +1,1 @@
+TRUNCATE TABLE incoming_mail_dispositions CASCADE;

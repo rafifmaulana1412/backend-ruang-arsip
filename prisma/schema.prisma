@@ -21,6 +21,17 @@ model users {
   role       roles      @relation(fields: [role_id], references: [id]) 
   division   divisions  @relation(fields: [division_id], references: [id]) 
 
+  sent_dispositions      incoming_mail_dispositions[] @relation("SenderDisposition")
+  received_dispositions  incoming_mail_dispositions[] @relation("ReceiverDisposition")
+
+  created_digital_documents digital_documents[] @relation("DigitalDocumentsCreator")
+  updated_digital_documents digital_documents[] @relation("DigitalDocumentsUpdater")
+  deleted_digital_documents digital_documents[] @relation("DigitalDocumentsDeleter")
+
+  created_outgoing_mails outgoing_mails[] @relation("OutgoingMailsCreator")
+  updated_outgoing_mails outgoing_mails[] @relation("OutgoingMailsUpdater")
+  deleted_outgoing_mails outgoing_mails[] @relation("OutgoingMailsDeleter")
+
   created_at  DateTime @default(now())
   updated_at DateTime @updatedAt
 }
@@ -60,6 +71,11 @@ model role_menus {
   id      String @id @default(uuid())
   role_id  String
   menu_id  String
+  
+  can_create Boolean @default(false)
+  can_read   Boolean @default(false)
+  can_update Boolean @default(false)
+  can_delete Boolean @default(false)
 
   role    roles   @relation(fields: [role_id], references: [id])
   menu    menus  @relation(fields: [menu_id], references: [id])
@@ -77,6 +93,8 @@ model storages {
   is_active      Boolean  @default(true)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
+
+  digital_documents digital_documents[]
 }
 
 model document_types {
@@ -87,6 +105,8 @@ model document_types {
   is_active      Boolean  @default(true)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
+
+  digital_documents digital_documents[]
 }
 
 
@@ -119,24 +139,70 @@ model incoming_mails {
 model dispositions {
   id            String     @id @default(uuid())
   name          String
+  due_date      Int?
   created_at    DateTime   @default(now())
-  mails         incoming_mail_dispositions[]
 }
 
 model incoming_mail_dispositions {
   id                     String     @id @default(uuid())
-  incoiming_mails_id     String
-  dispositions_id         String
+  incoming_mails_id      String
+  sender_id              String?
+  receiver_id            String
   note                   String?
   start_date             DateTime?
   due_date               DateTime?
   is_complete            Boolean    @default(false)
   completed_at           DateTime?
   disposed_at            DateTime?  @default(now())
-  incoming_mail          incoming_mails @relation(fields:[incoiming_mails_id], references:[id], onDelete:Cascade)
-  disposition            dispositions   @relation(fields:[dispositions_id], references:[id])
- 
-  @@unique([incoiming_mails_id, dispositions_id])
+  
+  incoming_mail          incoming_mails @relation(fields:[incoming_mails_id], references:[id], onDelete:Cascade)
+  sender                 users?         @relation("SenderDisposition", fields:[sender_id], references:[id])
+  receiver               users          @relation("ReceiverDisposition", fields:[receiver_id], references:[id])
+}
+
+model digital_documents {
+  id                 String   @id @default(uuid())
+  storage_id         String
+  resrtice_document  Boolean  @default(false)
+  document_type_id   String
+  document_number    String
+  document_name      String
+  description        String?
+  file               String?
+  status             Int      @default(0)
+  created_by         String?
+  updated_by         String?
+  deleted_by         String?
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  deleted_at         DateTime?
+
+  storage            storages       @relation(fields: [storage_id], references: [id])
+  document_type      document_types @relation(fields: [document_type_id], references: [id])
+  
+  creator            users? @relation("DigitalDocumentsCreator", fields: [created_by], references: [id])
+  updater            users? @relation("DigitalDocumentsUpdater", fields: [updated_by], references: [id])
+  deleter            users? @relation("DigitalDocumentsDeleter", fields: [deleted_by], references: [id])
+}
+
+model outgoing_mails {
+  id             String   @id @default(uuid())
+  name           String
+  send_date      DateTime
+  address        String
+  mail_number    String
+  file           String?
+  status         Int      @default(0)
+  created_by     String?
+  updated_by     String?
+  deleted_by     String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  deleted_at     DateTime?
+
+  creator        users? @relation("OutgoingMailsCreator", fields: [created_by], references: [id])
+  updater        users? @relation("OutgoingMailsUpdater", fields: [updated_by], references: [id])
+  deleter        users? @relation("OutgoingMailsDeleter", fields: [deleted_by], references: [id])
 }
 
 

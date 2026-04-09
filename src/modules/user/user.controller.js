@@ -1,6 +1,7 @@
 const service = require('./user.service');
 const { paginatedResponse, successResponse } = require('../../utils/response');
 const bcrypt = require('bcrypt')
+
 exports.getAll = async (req, res) => {
     try {
         const page = Number(req.query.page) || 1;
@@ -10,7 +11,6 @@ exports.getAll = async (req, res) => {
         const result = await service.getUsers({ page, limit, search });
         paginatedResponse(res, result.data, result.meta);
     } catch (error) {
-        console.log(error);
         res.status(400).json({
             success: false,
             messsage: error.messsage,
@@ -19,6 +19,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
+
     try {
         const result = await service.getUserById(req.params.id);
         successResponse(res, result);
@@ -68,7 +69,6 @@ exports.update = async (req, res) => {
             data: result,
         });
     } catch (err) {
-        console.log(err);
         return res.status(400).json({
             status: false,
             message: err.message,
@@ -81,11 +81,23 @@ exports.delete = async (req, res) => {
         await service.deleteUser(req.params.id);
         successResponse(res, null, "User deleted successfully");
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             status: false,
             message: error.message,
         });
     }
 };
+
+exports.getMe = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const data = await service.getProfile(userId);
+        successResponse(res, data);
+    } catch (error) {
+        res.status(400).json({
+            status: false,
+            messsage: error.messsage,
+        });
+    }
+}
 

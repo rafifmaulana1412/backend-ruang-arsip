@@ -101,3 +101,12 @@ exports.deleteUser = async (id) => {
     return repository.delete(id);
 };
 
+exports.getProfile = async (userId) => {
+    const user = await repository.findById(userId);
+    if (!user) {
+        throw new Error('User Not Found');
+    }
+
+    return user;
+};
+

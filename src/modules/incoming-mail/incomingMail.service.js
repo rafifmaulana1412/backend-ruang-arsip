@@ -38,7 +38,7 @@ exports.getIncomingMailsById = async (id) => {
     return documentType;
 };
 
-exports.createIncomingMails = async (payload, file) => {
+exports.createIncomingMails = async (payload) => {
 
     const mailData = {
         letter_prioritie_id: payload.letter_prioritie_id,
@@ -47,13 +47,13 @@ exports.createIncomingMails = async (payload, file) => {
         receive_date: payload.receive_date,
         address: payload.address,
         mail_number: payload.mail_number,
-        file: file ? `/uploads/mails/${file.filename}` : null
+        file: payload.file || null
     }
 
     return repository.create(mailData);
 };
 
-exports.createIncomingMailsWithDispo = async (payload, file) => {
+exports.createIncomingMailsWithDispo = async (payload) => {
     const mailData = {
         letter_prioritie_id: payload.letter_prioritie_id,
         regarding: payload.regarding,
@@ -61,17 +61,42 @@ exports.createIncomingMailsWithDispo = async (payload, file) => {
         receive_date: new Date(payload.receive_date),
         address: payload.address,
         mail_number: payload.mail_number,
-        file: file ? `/uploads/mails/${file.filename}` : null
+        file: payload.file || null
     };
 
     const dispositionsData = payload.dispositions.map(disp => ({
-        dispositions_id: disp.dispositions_id,
+        receiver_id: disp.receiver_id,
         note: disp.note,
         start_date: disp.start_date ? new Date(disp.start_date) : null,
         due_date: disp.due_date ? new Date(disp.due_date) : null
     }));
 
-    return await mailRepo.createWithDiposition(mailData, dispositionsData);
+    return await repository.createWithDiposition(mailData, dispositionsData);
+}
+
+exports.redispose = async (mailId, payload, senderId) => {
+    const mail = await repository.findById(mailId);
+    if (!mail) throw new Error("Incoming mail not found");
+    if (mail.status === 2) throw new Error("Cannot disposition a completed mail");
+
+    const newDispositionData = {
+        incoming_mails_id: mailId,
+        sender_id: senderId,
+        receiver_id: payload.receiver_id,
+        note: payload.note,
+        start_date: payload.start_date ? new Date(payload.start_date) : null,
+        due_date: payload.due_date ? new Date(payload.due_date) : null
+    };
+
+    // Need repository method for creating disposition
+    return repository.createDisposition(newDispositionData);
+}
+
+exports.completeIncomingMail = async (mailId) => {
+    const mail = await repository.findById(mailId);
+    if (!mail) throw new Error("Incoming mail not found");
+
+    return repository.update(mailId, { status: 2 });
 }
 
 exports.updateDocumentType = async (id, payload) => {

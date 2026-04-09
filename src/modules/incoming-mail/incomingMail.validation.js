@@ -1,50 +1,54 @@
 const Joi = require("joi");
 
-exports.createDocumentTypeSchema = Joi.object({
-    code: Joi.string()
-        .min(3)
-        .max(50)
-        .trim()
-        .required()
-        .messages({
-            "string.empty": "Document type code is required",
-            "string.min": " Document type code must be at least 3 characters",
-            "string.max": "Document type code must not exceed 50 characters",
-        }),
-    name: Joi.string()
-        .min(3)
-        .max(50)
-        .trim()
-        .required()
-        .messages({
-            "string.empty": "Document type name is required",
-            "string.min": " Document type name must be at least 3 characters",
-            "string.max": "Document type name must not exceed 50 characters",
-        }),
-    is_active: Joi.boolean()
-        .required()
-        .messages({
-            "string.empty": "Document type is_active is required",
-        }),
-    description: Joi.string()
-        .trim()
-        .optional(),
+exports.createIncomingMailSchema = Joi.object({
+    letter_prioritie_id: Joi.string().required().messages({
+        "string.empty": "Letter priority ID is required"
+    }),
+    regarding: Joi.string().allow('', null).optional(),
+    name: Joi.string().required().messages({
+        "string.empty": "Name is required"
+    }),
+
+    receive_date: Joi.date().iso().required().messages({
+        "date.base": "Receive date must be a valid date",
+        "any.required": "Receive date is required"
+    }),
+    address: Joi.string().required().messages({
+        "string.empty": "Address is required"
+    }),
+    mail_number: Joi.string().required().messages({
+        "string.empty": "Mail number is required"
+    }),
+    file: Joi.string().allow('', null).optional(),
+    description: Joi.string().allow('', null).optional(),
+    is_active: Joi.boolean().optional(),
+    dispositions: Joi.array().items(
+        Joi.object({
+            dispositions_id: Joi.string().required().messages({
+                "string.empty": "Disposition ID is required"
+            }),
+            note: Joi.string().allow('', null).optional(),
+            start_date: Joi.date().iso().allow(null).optional(),
+            due_date: Joi.date().iso().allow(null).optional()
+        })
+    ).optional()
 });
 
-exports.updateDocumentTypeSchema = Joi.object({
-    code: Joi.string()
-        .min(3)
-        .max(50)
-        .trim()
-        .optional(),
-    name: Joi.string()
-        .min(3)
-        .max(50)
-        .trim()
-        .optional(),
-    is_active: Joi.boolean()
-        .optional(),
-    description: Joi.string()
-        .trim()
-        .optional(),
+exports.updateIncomingMailSchema = Joi.object({
+    letter_prioritie_id: Joi.string().optional(),
+    regarding: Joi.string().allow('', null).optional(),
+    name: Joi.string().optional(),
+    receive_date: Joi.date().iso().optional(),
+    address: Joi.string().optional(),
+    mail_number: Joi.string().optional(),
+    file: Joi.string().allow('', null).optional(),
+    dispositions: Joi.array().items(
+        Joi.object({
+            dispositions_id: Joi.string().required(),
+            note: Joi.string().allow('', null).optional(),
+            start_date: Joi.date().iso().allow(null).optional(),
+            due_date: Joi.date().iso().allow(null).optional()
+        })
+    ).optional(),
+    status: Joi.number().integer().min(0).max(3).optional()
 });

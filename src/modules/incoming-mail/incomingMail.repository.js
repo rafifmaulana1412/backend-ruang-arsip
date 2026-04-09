@@ -7,9 +7,15 @@ exports.findMany = ({ where, skip, take }) => {
         include: {
             disposition_mails: {
                 include: {
-                    disposition: true
+                    sender: {
+                        select: { id: true, name: true, email: true, role_id: true, division_id: true }
+                    },
+                    receiver: {
+                        select: { id: true, name: true, email: true, role_id: true, division_id: true }
+                    }
                 }
-            }
+            },
+            letter_prioritie: true,
         }
     })
 };
@@ -24,7 +30,12 @@ exports.findById = (id) => {
         include: {
             disposition_mails: {
                 include: {
-                    disposition: true
+                    sender: {
+                        select: { id: true, name: true, email: true, role_id: true, division_id: true }
+                    },
+                    receiver: {
+                        select: { id: true, name: true, email: true, role_id: true, division_id: true }
+                    }
                 }
             }
         }
@@ -48,7 +59,13 @@ exports.createWithDiposition = async (data, dispositionsData) => {
             }
         },
         include: {
-            disposition_mails: true
+            disposition_mails: {
+                include: {
+                    sender: true,
+                    receiver: true,
+                }
+            },
+            letter_prioritie: true,
         }
     })
 }
@@ -67,4 +84,8 @@ exports.delete = (id) => {
     return prisma.incoming_mails.delete({
         where: { id }
     })
+}
+
+exports.createDisposition = (data) => {
+    return prisma.incoming_mail_dispositions.create({ data })
 }

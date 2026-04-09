@@ -1,5 +1,4 @@
 module.exports = (schema) => (req, res, next) => {
-    console.log(schema)
     const result = schema.validate(req.body, { abortEarly: false });
 
     if (result.error) {

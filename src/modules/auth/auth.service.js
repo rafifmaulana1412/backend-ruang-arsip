@@ -17,6 +17,12 @@ exports.login = async (payload) => {
     username: user.username,
     role_id: user.role_id,
     division_id: user.division_id,
+    role: {
+      role_name: user.role?.name,
+    },
+    division: {
+      division_name: user.division?.name,
+    },
   });
 
   const refreshToken = generateRefreshToken({
@@ -35,6 +41,12 @@ exports.login = async (payload) => {
       division_id: user.division_id,
       created_at: user.created_at,
       updated_at: user.updated_at,
+      role: {
+        role_name: user.role?.name,
+      },
+      division: {
+        division_name: user.division?.name,
+      },
     },
     token,
     refreshToken,
@@ -97,3 +109,5 @@ exports.logout = async (userId) => {
 
   return true;
 };
+
+

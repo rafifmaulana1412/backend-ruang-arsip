@@ -9,7 +9,6 @@ exports.getAll = async (req, res) => {
         const result = await service.getDivision({ page, limit, search })
         paginatedResponse(res, result.data, result.meta);
     } catch (error) {
-        console.log(error);
         res.status(400).json({
             success: false,
             messsage: error.messsage
@@ -55,7 +54,6 @@ exports.update = async (req, res) => {
             data: result,
         })
     } catch (err) {
-        console.log(err)
         return res.status(400).json({
             status: false,
             message: err.message
@@ -68,7 +66,6 @@ exports.delete = async (req, res) => {
         await service.deleteDivision(req.params.id)
         successResponse(res, null, "Division deleted successfully")
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             status: false,
             message: error.message

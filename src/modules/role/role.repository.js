@@ -36,3 +36,25 @@ exports.delete = (id) => {
         where: { id }
     })
 }
+
+exports.assignMenus = async (roleId, menusData) => {
+    // Delete existing
+    await prisma.role_menus.deleteMany({
+        where: { role_id: roleId }
+    });
+    
+    // Insert new
+    if (menusData && menusData.length > 0) {
+        return prisma.role_menus.createMany({
+            data: menusData.map(m => ({
+                role_id: roleId,
+                menu_id: m.menu_id,
+                can_create: !!m.can_create,
+                can_read: !!m.can_read,
+                can_update: !!m.can_update,
+                can_delete: !!m.can_delete
+            }))
+        });
+    }
+    return { count: 0 };
+}

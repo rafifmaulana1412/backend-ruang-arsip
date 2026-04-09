@@ -9,7 +9,7 @@ exports.getAll = async (req, res) => {
         const result = await service.getIncomingMails({ page, limit, search })
         paginatedResponse(res, result.data, result.meta);
     } catch (error) {
-        console.log(error);
+        console.log(error)
         res.status(400).json({
             success: false,
             messsage: error.messsage
@@ -39,6 +39,24 @@ exports.create = async (req, res) => {
             messsage: "Incoming mail created successfully",
         })
     } catch (err) {
+        console.log(err)
+        return res.status(400).json({
+            status: false,
+            message: err.message
+        })
+    }
+};
+
+exports.createWithDispo = async (req, res) => {
+    try {
+        const result = await service.createIncomingMailsWithDispo(req.body);
+        return res.status(201).json({
+            status: true,
+            data: result,
+            messsage: "Incoming mail created successfully",
+        })
+    } catch (err) {
+        console.log(err)
         return res.status(400).json({
             status: false,
             message: err.message
@@ -55,7 +73,6 @@ exports.update = async (req, res) => {
             data: result,
         })
     } catch (err) {
-        console.log(err)
         return res.status(400).json({
             status: false,
             message: err.message
@@ -68,10 +85,43 @@ exports.delete = async (req, res) => {
         await service.deleteDocumentType(req.params.id)
         successResponse(res, null, "Document type deleted successfully")
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             status: false,
             message: error.message
+        })
+    }
+}
+
+exports.redispose = async (req, res) => {
+    try {
+        // Assume req.user contains the authenticated user
+        const senderId = req.user ? req.user.id : null;
+        const result = await service.redispose(req.params.id, req.body, senderId);
+        return res.status(201).json({
+            status: true,
+            data: result,
+            messsage: "Mail redispositioned successfully",
+        })
+    } catch (err) {
+        return res.status(400).json({
+            status: false,
+            message: err.message
+        })
+    }
+}
+
+exports.complete = async (req, res) => {
+    try {
+        const result = await service.completeIncomingMail(req.params.id);
+        return res.status(200).json({
+            status: true,
+            data: result,
+            messsage: "Mail marked as completed",
+        })
+    } catch (err) {
+        return res.status(400).json({
+            status: false,
+            message: err.message
         })
     }
 }

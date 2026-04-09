@@ -9,7 +9,6 @@ exports.getAll = async (req, res) => {
         const result = await service.getRoles({ page, limit, search })
         paginatedResponse(res, result.data, result.meta);
     } catch (error) {
-        console.log(error);
         res.status(400).json({
             success: false,
             messsage: error.messsage
@@ -55,7 +54,6 @@ exports.update = async (req, res) => {
             data: result,
         })
     } catch (err) {
-        console.log(err)
         return res.status(400).json({
             status: false,
             message: err.message
@@ -68,12 +66,27 @@ exports.delete = async (req, res) => {
         await service.deleteRole(req.params.id)
         successResponse(res, null, "Role deleted successfully")
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             status: false,
             message: error.message
         })
     }
 }
+
+exports.assignMenus = async (req, res) => {
+    try {
+        const result = await service.assignMenus(req.params.id, req.body.menus);
+        return res.status(200).json({
+            status: true,
+            message: "Menus assigned successfully",
+            data: result,
+        });
+    } catch (err) {
+        return res.status(400).json({
+            status: false,
+            message: err.message
+        });
+    }
+};
 
 

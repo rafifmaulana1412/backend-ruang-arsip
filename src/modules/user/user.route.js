@@ -9,6 +9,7 @@ const {
 } = require("./user.validation");
 
 router.get('/', auth, controller.getAll);
+router.get("/me", auth, controller.getMe);
 router.post("/", auth, validate(createUserSchema), controller.create);
 router.get("/:id", auth, controller.getById);
 router.put("/:id", auth, validate(updateUserSchema), controller.update);
