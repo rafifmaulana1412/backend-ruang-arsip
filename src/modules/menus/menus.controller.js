@@ -31,6 +31,7 @@ exports.create = async (req, res) => {
             message: "Menu created successfully",
         });
     } catch (err) {
+        console.log(err)
         return res.status(400).json({ status: false, message: err.message });
     }
 };

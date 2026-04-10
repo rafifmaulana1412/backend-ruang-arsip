@@ -66,6 +66,7 @@ exports.createIncomingMailsWithDispo = async (payload) => {
 
     const dispositionsData = payload.dispositions.map(disp => ({
         receiver_id: disp.receiver_id,
+        sender_id: disp.sender_id,
         note: disp.note,
         start_date: disp.start_date ? new Date(disp.start_date) : null,
         due_date: disp.due_date ? new Date(disp.due_date) : null
@@ -99,22 +100,6 @@ exports.completeIncomingMail = async (mailId) => {
     return repository.update(mailId, { status: 2 });
 }
 
-exports.updateDocumentType = async (id, payload) => {
-    const documentType = await repository.findById(id);
-
-    if (!documentType) {
-        throw new Error("Document type not found");
-    }
-
-    if (payload.name) {
-        const existing = await repository.findByName(payload.name);
-        if (existing && existing.id !== id) {
-            throw new Error("Document type name already exists");
-        }
-    }
-
-    return repository.update(id, payload);
-};
 
 exports.deleteDocumentType = async (id) => {
     const documentType = await repository.findById(id);

@@ -10,6 +10,7 @@ const userRoutes = require("./modules/user/user.route");
 const incomingMails = require("./modules/incoming-mail/incomingMail.route");
 const dispositionRoutes = require("./modules/disposition/disposition.route");
 const menuRoutes = require("./modules/menus/menus.route");
+const roleMenuRoutes = require("./modules/role-menus/roleMenus.route");
 const digitalDocumentRoutes = require("./modules/digital-documents/digitalDocuments.route");
 const outgoingMailRoutes = require("./modules/outgoing-mails/outgoingMails.route");
 
@@ -35,7 +36,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/incoming-mails", incomingMails);
 app.use("/api/dispositions", dispositionRoutes);
 app.use("/api/menus", menuRoutes);
+app.use("/api/role-menus", roleMenuRoutes);
 app.use("/api/digital-documents", digitalDocumentRoutes);
 app.use("/api/outgoing-mails", outgoingMailRoutes);
+
 
 module.exports = app;

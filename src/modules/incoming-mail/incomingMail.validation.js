@@ -24,9 +24,10 @@ exports.createIncomingMailSchema = Joi.object({
     is_active: Joi.boolean().optional(),
     dispositions: Joi.array().items(
         Joi.object({
-            dispositions_id: Joi.string().required().messages({
-                "string.empty": "Disposition ID is required"
+            receiver_id: Joi.string().required().messages({
+                "string.empty": "Receiver ID is required"
             }),
+            sender_id: Joi.string().allow('', null).optional(),
             note: Joi.string().allow('', null).optional(),
             start_date: Joi.date().iso().allow(null).optional(),
             due_date: Joi.date().iso().allow(null).optional()

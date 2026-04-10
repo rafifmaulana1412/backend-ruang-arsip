@@ -12,7 +12,6 @@ const {
 router.get('/', auth, controller.getAll)
 router.post("/", auth, validate(createRoleSchema), controller.create);
 router.get("/:id", auth, controller.getById);
-router.post("/:id/menus", auth, controller.assignMenus);
 router.put("/:id", auth, validate(updateRoleSchema), controller.update);
 router.delete("/:id", auth, controller.delete);
 

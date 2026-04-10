@@ -73,13 +73,4 @@ exports.deleteRole = async (id) => {
     }
 
     return repository.delete(id);
-};
-
-exports.assignMenus = async (id, menusData) => {
-    const role = await repository.findById(id);
-    if (!role) {
-        throw new Error("Role not found");
-    }
-
-    return repository.assignMenus(id, menusData);
-};
+};

@@ -1,8 +1,19 @@
 const repository = require('./menus.repository');
 
-exports.getAllMenus = async () => {
-    return await repository.findMany();
+const buildMenuTree = (menus, parentId = null) => {
+    return menus
+        .filter((menu) => menu.parent_id === parentId)
+        .map((menu) => ({
+            ...menu,
+            children: buildMenuTree(menus, menu.id),
+        }));
 };
+
+exports.getAllMenus = async () => {
+    const menus = await repository.findMany();
+    return buildMenuTree(menus, null);
+};
+
 
 exports.getMenuById = async (id) => {
     const menu = await repository.findById(id);
