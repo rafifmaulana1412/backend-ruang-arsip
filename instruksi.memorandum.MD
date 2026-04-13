@@ -1,0 +1,23 @@
+### 1. endpoint memorandum
+
+- Buatkan table memorandum terdapat beberapa field
+  - divisi pengirim (ambil data dari table divisions) / divisi_id
+  - penerima memo, user (ambil data dari table users) / user_id
+  - no memo
+  - tanggal memo
+  - tanggal terima
+  - perihal
+  - file
+  - status
+  - created_by
+  - updated_by
+  - deleted_by
+  - created_at
+  - updated_at
+  - deleted_at
+- dengan bahasa inggris ya nama nama kolomnya
+- buatkan endpoint crud untuk memorandum
+- untuk file menggunakan base64
+- apabila penerima bernama Dina Admin Operasional memo tersebut diterima oleh Nina atau penerima lainnya maka Nina atau penerima lainnya bisa mendisposisikan memo tersebut
+- apabila memo sudah selesai maka memo tersebut tidak bisa di disposisikan lagi
+- untuk disposisi seperti disposisi surat masuk atau income-mails

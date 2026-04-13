@@ -5,7 +5,7 @@ exports.getAll = async (req, res) => {
         const result = await service.getAll();
         return res.status(200).json({ status: true, data: result, message: "Success" });
     } catch (error) {
-        return res.status(400).json({ status: false, message: error.message });
+        return res.status(o400).json({ status: false, message: error.message });
     }
 };
 
@@ -24,6 +24,7 @@ exports.create = async (req, res) => {
         const result = await service.create(req.body, userId);
         return res.status(201).json({ status: true, data: result, message: "Outgoing Mail created successfully" });
     } catch (err) {
+        console.log(err)
         return res.status(400).json({ status: false, message: err.message });
     }
 };

@@ -1,16 +1,24 @@
 const repository = require('./incomingMail.repository')
 
-exports.getIncomingMails = async ({ page, limit, search }) => {
+exports.getIncomingMails = async ({ page, limit, search, userId }) => {
     const skip = (page - 1) * limit;
 
-    const where = search
-        ? {
-            code: {
-                contains: search,
-                mode: "insensitive",
-            },
-        }
-        : {};
+    const where = {
+        ...(search && {
+            OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { mail_number: { contains: search, mode: "insensitive" } },
+                { regarding: { contains: search, mode: "insensitive" } }
+            ]
+        }),
+        ...(userId && {
+            disposition_mails: {
+                some: {
+                    receiver_id: userId
+                }
+            }
+        })
+    };
 
     const [data, total] = await Promise.all([
         repository.findMany({ where, skip, take: limit }),
@@ -101,11 +109,26 @@ exports.completeIncomingMail = async (mailId) => {
 }
 
 
-exports.deleteDocumentType = async (id) => {
-    const documentType = await repository.findById(id);
+exports.updateIncomingMail = async (id, payload) => {
+    const mail = await repository.findById(id);
 
-    if (!documentType) {
-        throw new Error("Document type not found");
+    if (!mail) {
+        throw new Error("Incoming mail not found");
+    }
+
+    if (mail.status === 2) {
+        throw new Error("Cannot edit a completed mail");
+    }
+
+    // Only allow updating incoming_mails fields. Exclude things like dispositions here.
+    return repository.update(id, payload);
+};
+
+exports.deleteIncomingMail = async (id) => {
+    const mail = await repository.findById(id);
+
+    if (!mail) {
+        throw new Error("Incoming mail not found");
     }
 
     return repository.delete(id);

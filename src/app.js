@@ -13,6 +13,7 @@ const menuRoutes = require("./modules/menus/menus.route");
 const roleMenuRoutes = require("./modules/role-menus/roleMenus.route");
 const digitalDocumentRoutes = require("./modules/digital-documents/digitalDocuments.route");
 const outgoingMailRoutes = require("./modules/outgoing-mails/outgoingMails.route");
+const memorandumRoutes = require("./modules/memorandum/memorandum.route");
 
 const app = express();
 app.use(cors());
@@ -39,6 +40,6 @@ app.use("/api/menus", menuRoutes);
 app.use("/api/role-menus", roleMenuRoutes);
 app.use("/api/digital-documents", digitalDocumentRoutes);
 app.use("/api/outgoing-mails", outgoingMailRoutes);
-
+app.use("/api/memorandums", memorandumRoutes);
 
 module.exports = app;
