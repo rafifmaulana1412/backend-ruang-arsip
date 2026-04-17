@@ -20,10 +20,22 @@ exports.findById = (id) => {
       email: true,
       created_at: true,
       updated_at: true,
-    },
-    include: {
-      role: true,
-      division: true,
+      refresh_token: true,
+      is_active: true,
+      is_restrict: true,
+      phone: true,
+      role: {
+        select: {
+          id: true,
+          name: true,
+        }
+      },
+      division: {
+        select: {
+          id: true,
+          name: true,
+        }
+      }
     },
   });
 };

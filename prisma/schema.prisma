@@ -13,6 +13,9 @@ model users {
   name        String  
   username    String
   email       String   @unique
+  phone       String?
+  is_active   Boolean  @default(true)
+  is_restrict Boolean  @default(false)
   password    String
   role_id     String
   division_id String

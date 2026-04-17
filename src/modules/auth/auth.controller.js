@@ -19,6 +19,7 @@ exports.refresh = async (req, res) => {
     const result = await service.refreshToken(refreshToken);
     successResponse(res, result);
   } catch (error) {
+    console.log(error);
     res.status(401).json({
       status: false,
       message: error.message,

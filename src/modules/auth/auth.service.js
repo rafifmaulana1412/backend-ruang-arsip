@@ -27,6 +27,16 @@ exports.login = async (payload) => {
 
   const refreshToken = generateRefreshToken({
     id: user.id,
+    email: user.email,
+    username: user.username,
+    role_id: user.role_id,
+    division_id: user.division_id,
+    role: {
+      role_name: user.role?.name,
+    },
+    division: {
+      division_name: user.division?.name,
+    },
   });
 
   await repository.update(user.id, {
@@ -75,6 +85,12 @@ exports.refreshToken = async (token) => {
     username: user.username,
     role_id: user.role_id,
     division_id: user.division_id,
+    role: {
+      role_name: user.role?.name,
+    },
+    division: {
+      division_name: user.division?.name,
+    },
   });
 
   return {

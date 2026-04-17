@@ -21,6 +21,13 @@ exports.createUserSchema = Joi.object({
             "string.empty": "Email is required",
             "string.email": "Email must be a valid email address",
         }),
+    phone: Joi.string()
+        .trim()
+        .optional(),
+    is_active: Joi.boolean()
+        .optional(),
+    is_restrict: Joi.boolean()
+        .optional(),
     password: Joi.string()
         .min(6)
         .required()
@@ -52,6 +59,13 @@ exports.updateUserSchema = Joi.object({
     email: Joi.string()
         .email()
         .trim()
+        .optional(),
+    phone: Joi.string()
+        .trim()
+        .optional(),
+    is_active: Joi.boolean()
+        .optional(),
+    is_restrict: Joi.boolean()
         .optional(),
     password: Joi.string()
         .min(6)

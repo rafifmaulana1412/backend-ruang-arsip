@@ -11,6 +11,7 @@ exports.getAll = async (req, res) => {
         const result = await service.getUsers({ page, limit, search });
         paginatedResponse(res, result.data, result.meta);
     } catch (error) {
+        console.log(error)
         res.status(400).json({
             success: false,
             messsage: error.messsage,

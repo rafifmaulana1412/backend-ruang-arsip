@@ -6,10 +6,32 @@ exports.findMany = ({ where, skip, take }) => {
         skip,
         take,
         orderBy: { created_at: 'desc' },
-        include: {
-            role: true,
-            division: true,
+        select: {
+            id: true,
+            role_id: true,
+            division_id: true,
+            name: true,
+            username: true,
+            email: true,
+            phone: true,
+            is_active: true,
+            is_restrict: true,
+            created_at: true,
+            updated_at: true,
+            role: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            division: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
         },
+
     });
 };
 
@@ -17,12 +39,34 @@ exports.count = (where) => {
     return prisma.users.count({ where });
 };
 
+// 
 exports.findById = (id) => {
     return prisma.users.findUnique({
         where: { id },
-        include: {
-            role: true,
-            division: true,
+        select: {
+            id: true,
+            role_id: true,
+            division_id: true,
+            name: true,
+            username: true,
+            email: true,
+            phone: true,
+            is_active: true,
+            is_restrict: true,
+            created_at: true,
+            updated_at: true,
+            role: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            },
+            division: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
         },
     });
 };
