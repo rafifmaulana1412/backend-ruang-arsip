@@ -12,13 +12,27 @@ const dispositionRoutes = require("./modules/disposition/disposition.route");
 const menuRoutes = require("./modules/menus/menus.route");
 const roleMenuRoutes = require("./modules/role-menus/roleMenus.route");
 const digitalDocumentRoutes = require("./modules/digital-documents/digitalDocuments.route");
+const digitalDocumentAccessRequestRoutes = require("./modules/digital-document-access-requests/digitalDocumentAccessRequests.route");
+const digitalDocumentLoanRoutes = require("./modules/digital-document-loans/digitalDocumentLoans.route");
+const digitalArchiveRoutes = require("./modules/digital-archives/digitalArchives.route");
 const outgoingMailRoutes = require("./modules/outgoing-mails/outgoingMails.route");
 const memorandumRoutes = require("./modules/memorandum/memorandum.route");
+const correspondenceRoutes = require("./modules/correspondence/correspondence.route");
+const { PUBLIC_PREFIX, STORAGE_ROOT } = require("./utils/persuratan-files");
+const {
+  PUBLIC_PREFIX: DIGITAL_ARCHIVE_PUBLIC_PREFIX,
+  STORAGE_ROOT: DIGITAL_ARCHIVE_STORAGE_ROOT,
+} = require("./utils/digital-archive-files");
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(PUBLIC_PREFIX, express.static(STORAGE_ROOT));
+app.use(
+  DIGITAL_ARCHIVE_PUBLIC_PREFIX,
+  express.static(DIGITAL_ARCHIVE_STORAGE_ROOT),
+);
 
 app.get("/api/", function (req, res) {
   res.json({
@@ -39,7 +53,14 @@ app.use("/api/dispositions", dispositionRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/role-menus", roleMenuRoutes);
 app.use("/api/digital-documents", digitalDocumentRoutes);
+app.use(
+  "/api/digital-document-access-requests",
+  digitalDocumentAccessRequestRoutes,
+);
+app.use("/api/digital-document-loans", digitalDocumentLoanRoutes);
+app.use("/api/digital-archives", digitalArchiveRoutes);
 app.use("/api/outgoing-mails", outgoingMailRoutes);
 app.use("/api/memorandums", memorandumRoutes);
+app.use("/api/correspondence", correspondenceRoutes);
 
 module.exports = app;

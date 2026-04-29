@@ -1,55 +1,76 @@
 const Joi = require("joi");
 
-exports.createIncomingMailSchema = Joi.object({
-    letter_prioritie_id: Joi.string().required().messages({
-        "string.empty": "Letter priority ID is required"
-    }),
-    regarding: Joi.string().allow('', null).optional(),
-    name: Joi.string().required().messages({
-        "string.empty": "Name is required"
-    }),
+const uploadedFileSchema = Joi.object({
+  buffer: Joi.any().required(),
+  name: Joi.string().trim().required(),
+  mime_type: Joi.string().trim().required(),
+}).unknown(true);
 
-    receive_date: Joi.date().iso().required().messages({
-        "date.base": "Receive date must be a valid date",
-        "any.required": "Receive date is required"
+const fileInputSchema = Joi.alternatives()
+  .try(Joi.string().trim().allow("", null), uploadedFileSchema)
+  .optional();
+
+const baseIncomingMailCreateSchema = Joi.object({
+  letter_prioritie_id: Joi.string().required().messages({
+    "string.empty": "Letter priority ID is required",
+  }),
+  division_id: Joi.string().required().messages({
+    "string.empty": "Division ID is required",
+  }),
+  regarding: Joi.string().trim().required().messages({
+    "string.empty": "Regarding is required",
+  }),
+  description: Joi.string().allow("", null).optional(),
+  name: Joi.string().trim().required().messages({
+    "string.empty": "Sender name is required",
+  }),
+  receive_date: Joi.date().iso().required().messages({
+    "date.base": "Receive date must be a valid date",
+    "any.required": "Receive date is required",
+  }),
+  address: Joi.string().trim().required().messages({
+    "string.empty": "Address is required",
+  }),
+  mail_number: Joi.string().trim().required().messages({
+    "string.empty": "Mail number is required",
+  }),
+  file: fileInputSchema.required().messages({
+    "any.required": "File is required",
+  }),
+});
+
+exports.createIncomingMailWithDispositionSchema = baseIncomingMailCreateSchema;
+
+exports.redisposeIncomingMailSchema = Joi.object({
+  receiver_id: Joi.string().required().messages({
+    "string.empty": "Receiver ID is required",
+  }),
+  note: Joi.string().allow("", null).optional(),
+  start_date: Joi.date().iso().allow(null).optional(),
+  due_date: Joi.date().iso().allow(null).optional(),
+});
+
+exports.updateIncomingDispositionStatusSchema = Joi.object({
+  status: Joi.string()
+    .trim()
+    .uppercase()
+    .valid("IN_PROGRESS", "COMPLETED")
+    .required()
+    .messages({
+      "any.only": "Status disposisi harus IN_PROGRESS atau COMPLETED",
+      "any.required": "Status disposisi wajib diisi",
     }),
-    address: Joi.string().required().messages({
-        "string.empty": "Address is required"
-    }),
-    mail_number: Joi.string().required().messages({
-        "string.empty": "Mail number is required"
-    }),
-    file: Joi.string().allow('', null).optional(),
-    description: Joi.string().allow('', null).optional(),
-    is_active: Joi.boolean().optional(),
-    dispositions: Joi.array().items(
-        Joi.object({
-            receiver_id: Joi.string().required().messages({
-                "string.empty": "Receiver ID is required"
-            }),
-            sender_id: Joi.string().allow('', null).optional(),
-            note: Joi.string().allow('', null).optional(),
-            start_date: Joi.date().iso().allow(null).optional(),
-            due_date: Joi.date().iso().allow(null).optional()
-        })
-    ).optional()
 });
 
 exports.updateIncomingMailSchema = Joi.object({
-    letter_prioritie_id: Joi.string().optional(),
-    regarding: Joi.string().allow('', null).optional(),
-    name: Joi.string().optional(),
-    receive_date: Joi.date().iso().optional(),
-    address: Joi.string().optional(),
-    mail_number: Joi.string().optional(),
-    file: Joi.string().allow('', null).optional(),
-    dispositions: Joi.array().items(
-        Joi.object({
-            dispositions_id: Joi.string().required(),
-            note: Joi.string().allow('', null).optional(),
-            start_date: Joi.date().iso().allow(null).optional(),
-            due_date: Joi.date().iso().allow(null).optional()
-        })
-    ).optional(),
-    status: Joi.number().integer().min(0).max(3).optional()
-});
+  letter_prioritie_id: Joi.string().optional(),
+  division_id: Joi.string().optional(),
+  regarding: Joi.string().trim().optional(),
+  description: Joi.string().allow("", null).optional(),
+  name: Joi.string().trim().optional(),
+  receive_date: Joi.date().iso().optional(),
+  address: Joi.string().trim().optional(),
+  mail_number: Joi.string().trim().optional(),
+  file: fileInputSchema,
+  status: Joi.number().integer().min(0).max(3).optional(),
+}).min(1);

@@ -1,84 +1,165 @@
-const prisma = require('../../config/prisma');
+const prisma = require("../../config/prisma");
 
-exports.findMany = (query) => {
-    return prisma.memorandums.findMany({
-        ...query,
-        include: {
-            division: true,
-            creator: true,
-            dispositions: {
-                include: {
-                    receiver: true,
-                    sender: true
-                }
-            }
-        },
-        orderBy: { id: "desc" }
-    });
+const baseInclude = {
+  division: true,
+  creator: true,
+  updater: true,
+  deleter: true,
+  dispositions: {
+    orderBy: [{ disposed_at: "asc" }, { id: "asc" }],
+    include: {
+      receiver: true,
+      sender: true,
+    },
+  },
 };
 
-exports.count = (where) => {
-    return prisma.memorandums.count({ where });
+function loadById(id) {
+  return prisma.memorandums.findUnique({
+    where: { id },
+    include: baseInclude,
+  });
+}
+
+exports.findMany = ({ where, skip, take }) => {
+  const query = {
+    where,
+    include: baseInclude,
+    orderBy: [{ memo_date: "desc" }, { created_at: "desc" }],
+  };
+
+  if (typeof skip === "number") {
+    query.skip = skip;
+  }
+
+  if (typeof take === "number") {
+    query.take = take;
+  }
+
+  return prisma.memorandums.findMany(query);
 };
+
+exports.count = (where) => prisma.memorandums.count({ where });
 
 exports.findById = (id) => {
-    return prisma.memorandums.findFirst({
-        where: { id, deleted_at: null },
-        include: {
-            division: true,
-            creator: true,
-            dispositions: {
-                include: {
-                    receiver: true,
-                    sender: true
-                }
-            }
-        }
-    });
+  return prisma.memorandums.findFirst({
+    where: { id, deleted_at: null },
+    include: baseInclude,
+  });
 };
 
 exports.createWithInitialReceivers = async (data, receiversData) => {
-    return await prisma.$transaction(async (tx) => {
-        const memo = await tx.memorandums.create({
-            data
-        });
+  const memorandum = await prisma.memorandums.create({
+    data,
+  });
 
-        const dispositions = receiversData.map(disp => ({
-            memorandums_id: memo.id,
-            receiver_id: disp.receiver_id,
-            sender_id: disp.sender_id
-        }));
+  await prisma.memorandum_dispositions.createMany({
+    data: receiversData.map((disposition) => ({
+      memorandums_id: memorandum.id,
+      receiver_id: disposition.receiver_id,
+      sender_id: disposition.sender_id,
+      parent_disposition_id: disposition.parent_disposition_id,
+      due_date: disposition.due_date,
+      start_date: disposition.start_date,
+      note: disposition.note,
+      status: disposition.status,
+    })),
+  });
 
-        await tx.memorandum_dispositions.createMany({
-            data: dispositions
-        });
-
-        return tx.memorandums.findUnique({
-            where: { id: memo.id },
-            include: { dispositions: true }
-        });
-    });
+  return loadById(memorandum.id);
 };
 
 exports.createDisposition = (data) => {
-    return prisma.memorandum_dispositions.create({
-        data
-    });
+  return prisma.memorandum_dispositions.create({
+    data,
+    include: {
+      receiver: true,
+      sender: true,
+    },
+  });
 };
 
-exports.update = (id, data) => {
-    return prisma.memorandums.update({
-        where: { id },
-        data,
-    });
+exports.findDispositionById = ({ memorandumId, dispositionId }) => {
+  return prisma.memorandum_dispositions.findFirst({
+    where: {
+      id: dispositionId,
+      memorandums_id: memorandumId,
+    },
+    include: {
+      receiver: true,
+      sender: true,
+    },
+  });
 };
 
-exports.delete = (id, deleted_by) => {
-    return prisma.memorandums.update({
-        where: { id },
-        data: {
-            deleted_by,
-            deleted_at: new Date()
-        }
-    });
+exports.findCurrentDispositionForReceiver = ({ memorandumId, receiverId }) => {
+  return prisma.memorandum_dispositions.findFirst({
+    where: {
+      memorandums_id: memorandumId,
+      receiver_id: receiverId,
+      status: {
+        in: ["NEW", "IN_PROGRESS"],
+      },
+    },
+    orderBy: [{ disposed_at: "desc" }, { id: "desc" }],
+    include: {
+      receiver: true,
+      sender: true,
+    },
+  });
+};
+
+exports.updateDisposition = (id, data) => {
+  return prisma.memorandum_dispositions.update({
+    where: { id },
+    data,
+    include: {
+      receiver: true,
+      sender: true,
+    },
+  });
+};
+
+exports.update = async (id, data) => {
+  await prisma.memorandums.update({
+    where: { id },
+    data,
+  });
+
+  return loadById(id);
+};
+
+exports.updateStoredFile = (id, file) => {
+  return prisma.memorandums.update({
+    where: { id },
+    data: { file },
+  });
+};
+
+exports.completeDispositions = (memorandumId) => {
+  return prisma.memorandum_dispositions.updateMany({
+    where: {
+      memorandums_id: memorandumId,
+      status: {
+        in: ["NEW", "IN_PROGRESS"],
+      },
+    },
+    data: {
+      status: "COMPLETED",
+      is_complete: true,
+      completed_at: new Date(),
+    },
+  });
+};
+
+exports.delete = async (id, deleted_by) => {
+  await prisma.memorandums.update({
+    where: { id },
+    data: {
+      deleted_by,
+      deleted_at: new Date(),
+    },
+  });
+
+  return loadById(id);
 };

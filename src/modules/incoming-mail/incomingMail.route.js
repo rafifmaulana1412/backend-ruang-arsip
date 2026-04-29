@@ -1,18 +1,51 @@
-const express = require('express')
+const express = require("express");
 const router = express.Router();
-const controller = require('./incomingMail.controller')
+const controller = require("./incomingMail.controller");
 const validate = require("../../middlewares/validate.middleware");
 const auth = require("../../middlewares/auth.middleware");
-const { createIncomingMailSchema, updateIncomingMailSchema } = require('./incomingMail.validation')
+const {
+  normalizePersuratanMultipartBody,
+  uploadPersuratanFile,
+} = require("../../middlewares/persuratan-upload.middleware");
+const {
+  createIncomingMailWithDispositionSchema,
+  redisposeIncomingMailSchema,
+  updateIncomingDispositionStatusSchema,
+  updateIncomingMailSchema,
+} = require("./incomingMail.validation");
 
-
-router.get('/', auth, controller.getAll)
-router.post("/", auth, validate(createIncomingMailSchema), controller.create);
-router.post("/with-disposition", auth, validate(createIncomingMailSchema), controller.createWithDispo);
+router.get("/", auth, controller.getAll);
+router.post(
+  "/with-disposition",
+  auth,
+  uploadPersuratanFile("file"),
+  validate(createIncomingMailWithDispositionSchema),
+  controller.createWithDispo,
+);
 router.get("/:id", auth, controller.getById);
-router.post("/:id/redispose", auth, controller.redispose);
+router.post(
+  "/:id/redispose",
+  auth,
+  validate(redisposeIncomingMailSchema),
+  controller.redispose,
+);
+router.patch(
+  "/:id/dispositions/:dispositionId/status",
+  auth,
+  validate(updateIncomingDispositionStatusSchema),
+  controller.updateDispositionStatus,
+);
 router.patch("/:id/complete", auth, controller.complete);
-router.put("/:id", auth, validate(updateIncomingMailSchema), controller.update);
+router.put(
+  "/:id",
+  auth,
+  uploadPersuratanFile("file"),
+  normalizePersuratanMultipartBody({
+    numberFields: ["status"],
+  }),
+  validate(updateIncomingMailSchema),
+  controller.update,
+);
 router.delete("/:id", auth, controller.delete);
 
-module.exports = router
+module.exports = router;
