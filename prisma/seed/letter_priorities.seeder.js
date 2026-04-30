@@ -6,9 +6,9 @@ export async function seedLetterPriorities() {
   await prisma.letter_priorities.createMany({
     data: [
       { id: crypto.randomUUID(), name: "Biasa" },
-      { id: crypto.randomUUID(), name: "Sedang" },
-      { id: crypto.randomUUID(), name: "Urgent" },
-      { id: crypto.randomUUID(), name: "Finance" },
+      { id: crypto.randomUUID(), name: "Rahasia" },
+      { id: crypto.randomUUID(), name: "Terbatas" },
+      { id: crypto.randomUUID(), name: "Sangat Terbatas" },
     ],
     skipDuplicates: true,
   });

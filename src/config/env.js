@@ -8,7 +8,6 @@ function loadEnv() {
   }
 
   dotenv.config({ path: ".env" });
-  dotenv.config({ path: ".env.local", override: true });
 
   loaded = true;
 }

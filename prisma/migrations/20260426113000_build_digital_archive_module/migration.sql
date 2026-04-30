@@ -8,12 +8,12 @@ CREATE TYPE "digital_document_loan_statuses" AS ENUM ('PENDING', 'APPROVED', 'RE
 CREATE TYPE "digital_document_activity_actions" AS ENUM ('CREATED', 'UPDATED', 'STORAGE_MOVED', 'DELETED', 'ACCESS_REQUESTED', 'ACCESS_APPROVED', 'ACCESS_REJECTED', 'LOAN_REQUESTED', 'LOAN_APPROVED', 'LOAN_REJECTED', 'LOAN_HANDED_OVER', 'LOAN_RETURNED');
 
 -- DropForeignKey
-ALTER TABLE "digital_documents" DROP CONSTRAINT "digital_documents_created_by_fkey";
+ALTER TABLE "digital_documents" DROP CONSTRAINT IF EXISTS "digital_documents_created_by_fkey";
 
 -- AlterTable
-ALTER TABLE "digital_documents" DROP COLUMN "resrtice_document",
-DROP COLUMN "status",
-ADD COLUMN     "is_restricted" BOOLEAN NOT NULL DEFAULT false,
+ALTER TABLE "digital_documents" DROP COLUMN IF EXISTS "resrtice_document",
+DROP COLUMN IF EXISTS "status",
+ADD COLUMN IF NOT EXISTS "is_restricted" BOOLEAN NOT NULL DEFAULT false,
 ALTER COLUMN "created_by" SET NOT NULL;
 
 -- CreateTable
@@ -108,7 +108,7 @@ CREATE INDEX "digital_document_activity_logs_from_storage_id_idx" ON "digital_do
 CREATE INDEX "digital_document_activity_logs_to_storage_id_idx" ON "digital_document_activity_logs"("to_storage_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "digital_documents_document_number_key" ON "digital_documents"("document_number");
+CREATE UNIQUE INDEX IF NOT EXISTS "digital_documents_document_number_key" ON "digital_documents"("document_number");
 
 -- AddForeignKey
 ALTER TABLE "digital_documents" ADD CONSTRAINT "digital_documents_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
